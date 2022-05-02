@@ -1,7 +1,16 @@
-# import pygambit as pg
+"""
+For generating extensive games for Gambit
+"""
+
 import numpy as np
+import os
+
+# set active directory to location of this file
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
 
 def gen_id(values):
+    """Helper that generates a unique integer id from a list of boolean values"""
     return sum((2**i * y for i, y in enumerate(values)))
 
 
@@ -37,6 +46,7 @@ class Terminal(Node):
             )
         payoffs = '{ ' + ' '.join(payoffs_iter) + ' }'
         lines.append(f't "" {my_id} "" {payoffs}')
+
 
 class PlayerVote(Node):
 
@@ -129,16 +139,18 @@ def write_game(
     p: np.ndarray = None,
     u: np.ndarray = None,
     v: np.ndarray = None,
-    filename: str = 'test.efg'
+    filename: str = None
 ):
     head = Head(n_players, p, u, v)
     lines = []
     head.write(lines)
     player_enum = '{ ' + ' '.join((f'"Player {i+1}"' for i in range(n_players))) + ' }'
     header = f'EFG 2 R "{n_players} player voting game" {player_enum}\n'
+    if filename is None:
+        filename = f'game_{n_players}_players.efg'
     with open(filename, 'w') as fh:
         fh.write(header + '\n'.join(lines))
 
 
 if __name__ == '__main__':
-    write_game(3, u=np.array([2.0, 1.0, 1.0]))
+    write_game(4)
